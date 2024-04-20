@@ -1,2 +1,2 @@
 # python-recipes
-Common python routines used in the Grant Lab at UBC
+Common python routines used the the Grant Lab at UBC
