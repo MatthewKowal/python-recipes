@@ -7,15 +7,73 @@ Created on Tue Apr 16 19:36:58 2024
 
 #this lesson covers 2d data manipulation. we will need from data to work with
 #so we will import some functions from the "generating_data" script.
-import os
-import sys
-folder, filename = os.path.split(__file__)  # get folder and filename of this script
-#modfolder = os.path.join(folder)            # I cant remember why this is here
-sys.path.insert(0, folder)               # add the current folder to the system path
-import generating_data as generating_data
-''' note: this runs the script to a ton of plots will come up '''
+# import os
+# import sys
+# folder, filename = os.path.split(__file__)  # get folder and filename of this script
+# #modfolder = os.path.join(folder)            # I cant remember why this is here
+# sys.path.insert(0, folder)               # add the current folder to the system path
+# import generating_data as generating_data
+# ''' note: this runs the script to a ton of plots will come up '''
 
-spectrum = generating_data.gendata_raman(num_peaks=5) #simulate a raman spectrum
+# spectrum = generating_data.gendata_raman(num_peaks=5) #simulate a raman spectrum
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+#lets make a function that returns some normally distributed data with noise
+def gendata_1dgauss(x_dim, amp, mean, std, offset, noise):
+    X = np.linspace(0,x_dim-1,x_dim)
+    y = offset + amp * np.exp( -((X-mean)/std)**2)
+    #add noise
+    y_n = y + noise * np.random.randn(*X.shape)
+    #plot
+    plot=False
+    if plot:
+        plt.rcParams['figure.figsize'] = [10, 5]
+        plt.figure(dpi=150)
+        #plt.scatter(X, y, color='black', s=4)
+        plt.scatter(X, y_n, color='red', s=1)
+        plt.show()
+    return y_n
+
+data = gendata_1dgauss(2000, 1, 1000, 50, 0, 0.01)
+#plt.plot(data)
+
+
+
+#now lets simulate Raman data by overlaying a few gaussians with random parameters
+#then add noise and add a large, wide backgroun fluoresence signal with another gaussian
+def gendata_raman(num_peaks, plot=True):
+    x_dim = 2000
+    X = np.linspace(0,x_dim-1,x_dim)
+    y = np.zeros(*X.shape)
+    for i in range(num_peaks):    
+        amp = np.random.rand()
+        mean = np.random.randint(0,x_dim)
+        std = np.random.rand()*40
+        y += gendata_1dgauss(x_dim, amp, mean, std, offset=0, noise=0)
+    #add noise
+    noise = 0.01
+    y += noise * np.random.randn(*X.shape)
+    #add fluoresence
+    amp = np.random.rand()*3
+    mean = np.random.randint(0,x_dim/2)
+    std = np.random.rand()*40+1000
+    y += gendata_1dgauss(x_dim, amp, mean, std, offset=0, noise=0)
+    #plot
+    if plot:
+        plt.rcParams['figure.figsize'] = [10, 5]
+        plt.figure(dpi=150)
+        plt.scatter(X, y, color='red', s=1)
+        plt.show()
+    
+    return y
+        
+num_peaks = 5
+spectrum = gendata_raman(num_peaks)
+
 
 #%%
 
@@ -65,7 +123,7 @@ def remove_baseline(spectrum, level, iterations):
     return newspec
 
 #generate a new raman spectrum
-spectrum = generating_data.gendata_raman(num_peaks=5, plot=False) #simulate a raman spectrum
+spectrum = gendata_raman(num_peaks=5, plot=False) #simulate a raman spectrum
 plt.plot(spectrum)
 
 #remove baseline, remove noise and normalize a spectrum
@@ -86,7 +144,7 @@ plt.plot(spec2)
 plt.title("raw raman, corrected raman, and gradient raman")
 plt.show()
 #%%
-        ''' resampling a spectrum '''
+''' resampling a spectrum '''
         
 
 # wavenums = np.linspace(400.2, 2000.4, len(spectrum))
@@ -129,7 +187,7 @@ def upsample_spectrum(spec, newsize):
     return resampled_spectrum
 
 #generate a spectrum and perform preprocessing
-spectrum = generating_data.gendata_raman(num_peaks=5, plot=False) #simulate a raman spectrum
+spectrum = gendata_raman(num_peaks=5, plot=False) #simulate a raman spectrum
 #remove baseline, remove noise and normalize a spectrum
 spec = spectrum
 spec = lowpass(spec, 2)
@@ -162,7 +220,7 @@ plt.show()
 def make_dataframe_from_spec():
     #this function is just a shortcut to automate making a random raman spectrum
     #make new spec data
-    spectrum = generating_data.gendata_raman(num_peaks=5, plot=False) #simulate a raman spectrum
+    spectrum = gendata_raman(num_peaks=5, plot=False) #simulate a raman spectrum
 
     #remove baseline, remove noise and normalize a spectrum
     spec = spectrum

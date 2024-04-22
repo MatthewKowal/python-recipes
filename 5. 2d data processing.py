@@ -125,8 +125,8 @@ def fit_gaussian_parameters(data): #find optimized gaussian fit for a particle
 paramsG       = fit_gaussian_parameters(image)
 Xin, Yin      = np.mgrid[0:(image.shape[0]), 0:(image.shape[1])]         #emtpy grid to fit the parameters to. must be the same size as the particle iamge
 fitG          = gaussian(*paramsG)(Xin, Yin)
-generating_data.plot3d(image, "raw data")
-generating_data.plot3d(fitG, "best fit gaussian")
+plot3d(image, "raw data")
+plot3d(fitG, "best fit gaussian")
 
 #%%
 
