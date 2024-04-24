@@ -5,10 +5,12 @@ Created on Tue Apr 16 19:36:58 2024
 @author: user1
 """
 
-
+'''
 # #this lesson covers 2d data manipulation.
-# #we will need data to work with so lets first generate some methods
-# #to generate some data that looks like what we see with an iscat microscope
+# #we will need data to work with so lets first define some methods
+# #that will generate data that looks like what we see with an iscat microscope
+'''
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -45,11 +47,12 @@ def plot3d(Z, title=""):
 
 
 
-''' GAUSSIAN '''
+''' GAUSSIAN 
 #this function will simulates and return an iscat point spread function (scattering signal)
 #modelled as a gaussian function
 #please supply the square image dimension, the gaussian amplitude, and standard deviation (width)
-#this is a lambda function which defines the 2d gaussian function
+#this is a lambda function which defines the 2d gaussian function '''
+
 def gaussian(height, center_x, center_y, width_x, width_y, z_offset): #gaussian lamda function generator
     """Returns a gaussian function with the given parameters"""
     # width_x = float(width_x)
@@ -87,8 +90,8 @@ def generate_psf(noise=0.002, dim=30, amp=-0.03, sig=6, offset=1, plot=False):
 
 
 
-'''Laplacian of Gaussian'''
-#this is a more accurate representation of a point spread function than a gaussian
+'''Laplacian of Gaussian
+#this is a more accurate representation of a point spread function than a gaussian '''
 
 def LoG(height, center_x, center_y, sigma):
     ox = lambda x: center_x - x
@@ -114,8 +117,8 @@ def generate_log(noise=0.002, dim=30, ampmin=0.005, ampmax=0.01, sig=4, plot=Fal
 
 
 
-'''Difference of Gaussian'''
-# generate a point spread function based on the shape of the difference of two gaussian
+'''Difference of Gaussian
+# generate a point spread function based on the shape of the difference of two gaussian '''
 def DoG(height1, height2, center_x, center_y, sigma1, sigma2):
     #throw away height2, using it causes the optimize function to run past the max number of iterations its willing to. using the same height for each gaussian seems to work well anyway
     ox = lambda x: center_x - x
@@ -208,6 +211,7 @@ def generate_iscat_image(imgxy, n, method):
 
 image, pl = generate_iscat_image(256,5, 'log')
 plt.imshow(image)
+plt.colorbar()
 plt.show()
 # plot3d(image)
 print(pl)
